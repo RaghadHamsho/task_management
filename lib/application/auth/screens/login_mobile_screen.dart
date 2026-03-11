@@ -42,16 +42,15 @@ class LoginMobileScreen extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child:KeyboardVisibilityBuilder(
-    builder: (context, isKeyboardVisible) {
+        child:
 
-            return SingleChildScrollView(
+          SingleChildScrollView(
               child: Column(
                 mainAxisAlignment:
-                isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
+               MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 10),
-              if(!isKeyboardVisible)...[
+
                   /// ICON
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -92,7 +91,7 @@ class LoginMobileScreen extends StatelessWidget {
                       color: isDark ? Colors.grey : Colors.black54,
                       fontSize: 13,
                     ),
-                  ),],
+                  ),
               
                   const SizedBox(height: 30),
               
@@ -259,11 +258,10 @@ class LoginMobileScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+
+             ] ),
+            ),
+
       ),
     );
   }
