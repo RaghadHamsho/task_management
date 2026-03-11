@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +18,7 @@ import '../../../core/values/values.dart' as values;
 import 'package:task_management_system/core/values/values.dart';
 
 class LoginWebScreen extends StatelessWidget {
-   LoginWebScreen({super.key});
+  LoginWebScreen({super.key});
 
   final _formKey = GlobalKey<FormState>();
 
@@ -30,248 +32,251 @@ class LoginWebScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = getIt<AppStore>().isDarkMode;
 
-    return  Row(
-        children: [
-          /// LEFT IMAGE
-          if(MediaQuery.of(context).size.width>950)
-          Expanded(
-            flex: 3,
-            child: Image.asset(
-          getIt<AppStore>().selectedLanguageCode =='en'?ImagePath.loginBackgroundEnglish:    ImagePath.loginBackgroundArabic,
+    return Stack(
+      children: [
+        /// BACKGROUND IMAGE
+        Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                getIt<AppStore>().selectedLanguageCode == 'en'
+                    ? ImagePath.loginBackgroundEnglish
+                    : ImagePath.loginBackgroundArabic,
+              ),
               fit: BoxFit.cover,
-              height: double.infinity,
             ),
           ),
+        ),
 
-          /// RIGHT LOGIN/SIGNUP FORM
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [Color(0xFF121212), Color(0xFF1E1E1E)]
-                      : [Color(0xFFD5F6F2), Color(0xFFD0F6E0)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-
-                  /// ICON
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          values.AppColors.kDarkGreenColor,
-                          values.AppColors.kLightGreenColor,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.library_add_check_outlined,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+        /// GLASS + CONTENT
+        Align(
+          alignment: getIt<AppStore>().selectedLanguageCode == 'en'
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 80),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  width: 475,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.10),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(.3)),
                   ),
 
-                  const SizedBox(height: 12),
+                  /// YOUR EXISTING COLUMN
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 30),
 
-                  /// TITLE
-                  Text(
-                    language.appName,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: colors(context).textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    language.title,
-                    style: TextStyle(
-                      color: isDark ? Colors.grey : Colors.black54,
-                      fontSize: 13,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  /// CARD
-                  Container(
-                    width: 435,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: colors(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 20,
-                          color: Colors.black.withOpacity(.08),
-                          offset: const Offset(0, 8),
+                      /// ICON
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              values.AppColors.kDarkGreenColor,
+                              values.AppColors.kLightGreenColor,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
-                    child: BlocBuilder<ChangeCardCubit, bool>(
-                      builder: (context, isSignUp) {
-                        return Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isSignUp ? language.createAccount : language.login,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: colors(context).textColor,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
+                        child: const Icon(
+                          Icons.library_add_check_outlined,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
 
-                              if (isSignUp) ...[
+                      const SizedBox(height: 12),
+
+                      /// TITLE
+                      Text(
+                        language.appName,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      /// YOUR LOGIN CARD CONTENT
+                      BlocBuilder<ChangeCardCubit, bool>(
+                        builder: (context, isSignUp) {
+                          return Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  language.userName,
+                                  isSignUp
+                                      ? language.createAccount
+                                      : language.login,
                                   style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                     color: colors(context).textColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+
+                                if (isSignUp) ...[
+                                  Text(
+                                    language.userName,
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  CustomTextField(
+                                    controller: usernameController,
+                                    hint: language.enterUserName,
+                                    icon: Icons.person_outline,
+                                    isAuth: true,
+                                    validator: Functions.usernameValidator,
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+
+                                /// EMAIL
+                                Text(
+                                  language.email,
+                                  style: TextStyle(
+                                    color: Colors.white70,
                                     fontSize: 14,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
                                 CustomTextField(
-                                  controller: usernameController,
-                                  hint: language.enterUserName,
-                                  icon: Icons.person_outline,
+                                  controller: emailController,
+                                  hint: language.enterEmail,
+                                  icon: Icons.email_outlined,
                                   isAuth: true,
-                                  validator: Functions.usernameValidator,
+                                  validator: Functions.emailValidator,
                                 ),
                                 const SizedBox(height: 10),
-                              ],
 
-                              /// EMAIL
-                              Text(
-                                language.email,
-                                style: TextStyle(
-                                  color: colors(context).textColor,
-                                  fontSize: 14,
+                                /// PASSWORD
+                                Text(
+                                  language.password,
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              CustomTextField(
-                                controller: emailController,
-                                hint: language.enterEmail,
-                                icon: Icons.email_outlined,
-                                isAuth: true,
-                                validator: Functions.emailValidator,
-                              ),
-                              const SizedBox(height: 10),
-
-                              /// PASSWORD
-                              Text(
-                                language.password,
-                                style: TextStyle(
-                                  color: colors(context).textColor,
-                                  fontSize: 14,
+                                const SizedBox(height: 6),
+                                CustomTextField(
+                                  controller: passwordController,
+                                  hint: language.enterPassword,
+                                  icon: Icons.lock,
+                                  isPassword: true,
+                                  isAuth: true,
+                                  validator: Functions.passwordValidator,
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              CustomTextField(
-                                controller: passwordController,
-                                hint: language.enterPassword,
-                                icon: Icons.lock,
-                                isPassword: true,
-                                isAuth: true,
-                                validator: Functions.passwordValidator,
-                              ),
 
-                              if (!isSignUp) ...[
-                                const SizedBox(height: 4),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: Text(
-                                    language.forgotPassword,
-                                    style: TextStyle(
-                                      color: colors(context).textColor,
-                                      fontSize: 14,
+                                if (!isSignUp) ...[
+                                  const SizedBox(height: 4),
+                                  Align(
+                                    alignment:getIt<AppStore>().selectedLanguageCode == "en"? Alignment.topRight:AlignmentGeometry.topLeft,
+                                    child: Text(
+                                      language.forgotPassword,
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                      ),
                                     ),
+                                  ),
+                                ],
+
+                                SizedBox(height: isSignUp ? 20 : 50),
+
+                                /// BUTTON
+                                CustomButton(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      values.AppColors.kDarkGreenColor,
+                                      values.AppColors.kLightGreenColor,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  text: isSignUp
+                                      ? language.createAccount
+                                      : language.login,
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      // Navigate only if valid
+                                      TasksScreen().launch(context);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 35),
+
+                      /// TOGGLE SIGN IN / SIGN UP
+                      GestureDetector(
+                        onTap: () {
+                          context.read<ChangeCardCubit>().toggleAuth();
+                        },
+                        child: BlocBuilder<ChangeCardCubit, bool>(
+                          builder: (context, isSignUp) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  isSignUp
+                                      ? language.alreadyHaveAccount
+                                      : language.dontHaveAccount,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                SizedBox(width: 4,),
+                                Text(
+                                  isSignUp
+                                      ? language.login
+                                      : language.createAccount,
+
+                                  style: TextStyle(
+                                 decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.white70,
                                   ),
                                 ),
                               ],
-
-                              SizedBox(height: isSignUp ? 20 : 50),
-
-                              /// BUTTON
-                              CustomButton(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    values.AppColors.kDarkGreenColor,
-                                    values.AppColors.kLightGreenColor,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                text: isSignUp ? language.createAccount : language.login,
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    // Navigate only if valid
-                                    TasksScreen().launch(context);
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-
-                  const SizedBox(height: 35),
-
-                  /// TOGGLE SIGN IN / SIGN UP
-                  GestureDetector(
-                    onTap: () {
-                      context.read<ChangeCardCubit>().toggleAuth();
-                    },
-                    child: BlocBuilder<ChangeCardCubit, bool>(
-                      builder: (context, isSignUp) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              isSignUp
-                                  ? language.alreadyHaveAccount
-                                  : language.dontHaveAccount,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: colors(context).textColor,
-                              ),
-                            ),
-                            Text(
-                              isSignUp ?language.login: language.createAccount,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: colors(context).textColor,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-
-                ],
+                ),
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
 
+    /// RIGHT LOGIN/SIGNUP FORM
+    // Expanded(
+    //   flex: 3,
+    //   child:
   }
 }
