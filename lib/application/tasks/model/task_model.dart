@@ -4,7 +4,7 @@ class TaskModel {
   final String name;
   final String description;
   final DateTime createDate;
-  String status;
+   TaskStatus status;
 
   TaskModel({
     required this.name,
@@ -36,25 +36,26 @@ List<TaskModel> taskList = [
     name: "Design UI",
     description: "Create dashboard layout",
     createDate: DateTime(2026, 3, 12),
-    status: language.pending, // استخدم اللغة هنا
+    status: TaskStatus.pending, // استخدم اللغة هنا
   ),
   TaskModel(
     name: "Fix Bugs",
     description: "Resolve login bug",
     createDate: DateTime(2026, 3, 10),
-    status: language.completed, // استخدم اللغة هنا
+    status: TaskStatus.completed, // استخدم اللغة هنا
   ),
   TaskModel(
     name: "API Integration",
     description: "Connect mobile app with backend API",
     createDate: DateTime(2026, 3, 8),
-    status: language.pending,
+    status: TaskStatus.pending,
   ),
   TaskModel(
     name: "Testing",
     description: "Test all modules before release",
     createDate: DateTime(2026, 3, 5),
-    status: language.completed,
+    status: TaskStatus.completed,
   ),
 ];
 
+enum TaskStatus { pending, completed }

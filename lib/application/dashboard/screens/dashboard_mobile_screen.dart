@@ -11,9 +11,9 @@ class DashboardMobileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int completedCount = taskList.where((t) => t.status == language.completed).length;
+    int completedCount = taskList.where((t) => t.status == TaskStatus.completed).length;
 
-    int pendingCount = taskList.where((t) => t.status == language.pending).length;
+    int pendingCount = taskList.where((t) => t.status ==TaskStatus.completed).length;
 
     int totalCount = taskList.length;
     Map<int, int> completedPerMonth = {};
@@ -28,7 +28,7 @@ class DashboardMobileScreen extends StatelessWidget {
     for (var task in taskList) {
       int month = task.createDate.month;
 
-      if (task.status == language.completed) {
+      if (task.status == TaskStatus.completed) {
         completedPerMonth[month] = (completedPerMonth[month] ?? 0) + 1;
       } else {
         pendingPerMonth[month] = (pendingPerMonth[month] ?? 0) + 1;

@@ -1,5 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:task_management_system/configure_di.dart';
+import 'package:task_management_system/core/app_store/app_store.dart';
 import 'package:task_management_system/core/utils/functions.dart';
 import 'package:task_management_system/core/widgets/button_widget.dart';
 import 'package:task_management_system/main.dart';
@@ -18,21 +20,13 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  String selectedStatus = language.allStatus;
-
-  List<String> statuses = [
-    language.allStatus,
-    language.completed,
-    language.pending,
-  ];
+  List<String> statuses = ["all Status", "Completed", "Pending"];
+  String selectedStatus = "all Status";
 
   /// FILTER TASKS
   List<TaskModel> get filteredTasks {
-    if (selectedStatus == language.allStatus) {
-      return taskList;
-    }
-
-    return taskList.where((task) => task.status == selectedStatus).toList();
+    if (selectedStatus == "all Status") return taskList;
+    return taskList.where((task) => getTaskStatusText(task.status) == selectedStatus).toList();
   }
 
   /// ADD TASK
@@ -40,7 +34,7 @@ class _TasksScreenState extends State<TasksScreen> {
     TextEditingController nameController = TextEditingController();
     TextEditingController descController = TextEditingController();
 
-    String status = language.pending;
+    TaskStatus status = TaskStatus.pending;
 
     showDialog(
       context: context,
@@ -49,7 +43,6 @@ class _TasksScreenState extends State<TasksScreen> {
           builder: (context, setStateDialog) {
             return AlertDialog(
               backgroundColor: colors(context).cardColor,
-
               title: Text(
                 language.addNewTask,
                 style: TextStyle(
@@ -58,7 +51,6 @@ class _TasksScreenState extends State<TasksScreen> {
                   color: colors(context).textColor,
                 ),
               ),
-
               content: SizedBox(
                 width: 400,
                 child: Column(
@@ -67,55 +59,43 @@ class _TasksScreenState extends State<TasksScreen> {
                   children: [
                     Text(language.taskName),
                     const SizedBox(height: 5),
-
                     CustomTextField(
                       controller: nameController,
                       hint: language.enterTaskName,
                     ),
-
                     const SizedBox(height: 15),
-
                     Text(language.taskDescription),
                     const SizedBox(height: 5),
-
                     CustomTextField(
                       controller: descController,
                       hint: language.enterTaskDescription,
                     ),
-
                     const SizedBox(height: 15),
-
                     Text(language.taskStatus),
                     const SizedBox(height: 5),
-
                     DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
+                      child: DropdownButton2<TaskStatus>(
                         value: status,
-
                         dropdownStyleData: DropdownStyleData(
                           decoration: BoxDecoration(
                             color: colors(context).cardColor,
                           ),
                         ),
-                        items: statuses.map((item) {
+                        items: TaskStatus.values.map((item) {
                           return DropdownMenuItem(
+                          value: item,
+                          child: Text(
+            item == TaskStatus.pending ? "Pending" : "Completed",
+            style: TextStyle(fontSize: 14, color: colors(context).textColor),
+            ),
+            );
+            }).toList(),
+            onChanged: (value) {
+            setStateDialog(() {
+            status = value!;
+            });
+            },
 
-                            value: item,
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: colors(context).textColor,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            status = value!;
-                          });
-                        },
 
                         buttonStyleData: ButtonStyleData(
                           height: 45,
@@ -131,7 +111,6 @@ class _TasksScreenState extends State<TasksScreen> {
                   ],
                 ),
               ),
-
               actions: [
                 SizedBox(
                   width: 100,
@@ -139,9 +118,7 @@ class _TasksScreenState extends State<TasksScreen> {
                     text: language.cancel,
                     color: Colors.transparent,
                     textColor: colors(context).textColor,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
                 SizedBox(
@@ -163,7 +140,7 @@ class _TasksScreenState extends State<TasksScreen> {
                             name: nameController.text,
                             description: descController.text,
                             createDate: DateTime.now(),
-                            status: status,
+                            status: status, // هنا نخزن enum
                           ),
                         );
                       });
@@ -172,8 +149,6 @@ class _TasksScreenState extends State<TasksScreen> {
                     },
                   ),
                 ),
-
-
               ],
             );
           },
@@ -191,18 +166,13 @@ class _TasksScreenState extends State<TasksScreen> {
     TextEditingController descController = TextEditingController(
       text: task.description,
     );
-    String status = task.status;
+    TaskStatus status = task.status; // استخدم enum هنا
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            List<String> statuses = [
-              language.allStatus,
-              language.completed,
-              language.pending,
-            ];
             return AlertDialog(
               backgroundColor: colors(context).cardColor,
               title: Padding(
@@ -262,22 +232,23 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                     const SizedBox(height: 3),
                     DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
+                      child: DropdownButton2<TaskStatus>(
                         value: status,
-                        items: statuses
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colors(context).textColor,
-                                  ),
-                                ),
+                        alignment: Alignment.center,
+                        items: TaskStatus.values.map((item) {
+                          return DropdownMenuItem<TaskStatus>(
+                            value: item,
+
+                            child: Text(
+                              item == TaskStatus.pending ? "Pending" : "Completed",
+
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colors(context).textColor,
                               ),
-                            )
-                            .toList(),
+                            ),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setStateDialog(() {
                             status = value!;
@@ -287,6 +258,7 @@ class _TasksScreenState extends State<TasksScreen> {
                           height: 50,
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
+
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: Colors.grey.shade300),
@@ -299,7 +271,7 @@ class _TasksScreenState extends State<TasksScreen> {
                           maxHeight: 200,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: colors(context).backgroundColor,
+                            color: Colors.white,
                           ),
                         ),
                         menuItemStyleData: const MenuItemStyleData(height: 40),
@@ -319,7 +291,6 @@ class _TasksScreenState extends State<TasksScreen> {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-
                 // Save
                 SizedBox(
                   width: 100,
@@ -339,7 +310,7 @@ class _TasksScreenState extends State<TasksScreen> {
                           name: nameController.text,
                           description: descController.text,
                           createDate: task.createDate,
-                          status: status,
+                          status: status, // هنا نخزن enum
                         );
                       });
                       Navigator.pop(context);
@@ -627,9 +598,9 @@ class _TasksScreenState extends State<TasksScreen> {
                                 onTap: () {
                                   setState(() {
                                     task.status =
-                                        task.status == language.completed
-                                        ? language.pending
-                                        : language.completed;
+                                        task.status == TaskStatus.completed
+                                        ? TaskStatus.pending
+                                        : TaskStatus.completed;
                                   });
                                 },
 
@@ -718,21 +689,15 @@ class _TasksScreenState extends State<TasksScreen> {
 
 /// STATUS WIDGET
 
-Widget statusWidget(String status) {
-  bool isCompleted = status == language.completed;
+Widget statusWidget(TaskStatus status) {
+  bool isCompleted = status == TaskStatus.completed;
 
   return Row(
     children: [
-      Icon(
-        Icons.circle,
-        size: 10,
-        color: isCompleted ? Colors.green : Colors.orange,
-      ),
-
+      Icon(Icons.circle, size: 10, color: isCompleted ? Colors.green : Colors.orange),
       const SizedBox(width: 6),
-
       Text(
-        status,
+        getTaskStatusText(status),
         style: TextStyle(
           color: isCompleted ? Colors.green : Colors.orange,
           fontWeight: FontWeight.w500,
@@ -745,28 +710,32 @@ Widget statusWidget(String status) {
 /// TASK NAME WIDGET
 
 Widget taskNameWidget(TaskModel task, BuildContext context) {
-  bool isCompleted = task.status == language.completed;
-  bool isPending = task.status == language.pending;
+  bool isCompleted = task.status == TaskStatus.completed;
+  bool isPending = task.status == TaskStatus.pending;
 
   return Row(
     children: [
       if (isCompleted) const Icon(Icons.check_circle, color: Colors.green),
-
-      if (isPending)
-        Icon(Icons.circle_outlined, color: colors(context).textColor),
-
+      if (isPending) Icon(Icons.circle_outlined, color: colors(context).textColor),
       const SizedBox(width: 6),
-
       Expanded(
         child: Text(
           task.name,
           style: TextStyle(
-            decoration: isCompleted
-                ? TextDecoration.lineThrough
-                : TextDecoration.none,
+            decoration: isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
           ),
         ),
       ),
     ],
   );
+}
+
+String getTaskStatusText(TaskStatus status) {
+  switch (status) {
+    case TaskStatus.pending:
+      return "Pending";
+    case TaskStatus.completed:
+      return "Completed";
+  }
+
 }

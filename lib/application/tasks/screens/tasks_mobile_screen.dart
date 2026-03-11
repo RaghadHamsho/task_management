@@ -18,36 +18,35 @@ class TasksMobileScreen extends StatefulWidget {
 }
 
 class _TasksMobileScreenState extends State<TasksMobileScreen> {
-  String selectedStatus = language.allStatus;
+  List<String> statuses = ["all Status", "Completed", "Pending"];
+  String selectedStatus = "all Status";
+
+  /// FILTER TASKS
+  List<TaskModel> get filteredTasks {
+    if (selectedStatus == "all Status") return taskList;
+    return taskList.where((task) => getTaskStatusText(task.status) == selectedStatus).toList();
+  }
 
   /// ================= ADD TASK DIALOG =================
   void showAddTaskDialog() {
     TextEditingController nameController = TextEditingController();
     TextEditingController descController = TextEditingController();
-    String status = language.pending;
+
+    TaskStatus status = TaskStatus.pending; // استخدم enum بدلاً من النص
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            List<String> statuses = [
-              language.allStatus,
-              language.completed,
-              language.pending,
-            ];
-
             return AlertDialog(
               backgroundColor: colors(context).cardColor,
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 9),
-                child: Text(
-                  language.addNewTask,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colors(context).textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+              title: Text(
+                language.addNewTask,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colors(context).textColor,
                 ),
               ),
               content: SizedBox(
@@ -56,111 +55,78 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Task Name
-                    Text(language.taskName,
-                        style: TextStyle(
-                            fontSize: 14, color: colors(context).textColor)),
-                    const SizedBox(height: 3),
+                    Text(language.taskName),
+                    const SizedBox(height: 5),
                     CustomTextField(
                       controller: nameController,
                       hint: language.enterTaskName,
                     ),
                     const SizedBox(height: 15),
-
-                    // Description
-                    Text(language.taskDescription,
-                        style: TextStyle(
-                            fontSize: 14, color: colors(context).textColor)),
-                    const SizedBox(height: 3),
+                    Text(language.taskDescription),
+                    const SizedBox(height: 5),
                     CustomTextField(
                       controller: descController,
                       hint: language.enterTaskDescription,
                     ),
                     const SizedBox(height: 15),
-
-                    // Status
-                    Text(language.taskStatus,
-                        style: TextStyle(
-                            fontSize: 14, color: colors(context).textColor)),
-                    const SizedBox(height: 3),
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
-                        value: status,
-                        items: statuses
-                            .map((item) => DropdownMenuItem<String>(
+                    Text(language.taskStatus),
+                    const SizedBox(height: 5),
+                    DropdownButton2<TaskStatus>(
+                      value: status,
+                      items: TaskStatus.values.map((item) {
+                        return DropdownMenuItem(
                           value: item,
-                          child: Text(item,
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: colors(context).textColor)),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
+                          child: Text(
+                            item == TaskStatus.pending ? "Pending" : "Completed",
+                            style: TextStyle(fontSize: 14, color: colors(context).textColor),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {         // <-- check null first
                           setStateDialog(() {
-                            status = value!;
+                            status = value;
                           });
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 50,
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                        ),
-                        iconStyleData: const IconStyleData(
-                          icon: Icon(Icons.keyboard_arrow_down),
-                        ),
-                        dropdownStyleData: DropdownStyleData(
-                          maxHeight: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: colors(context).backgroundColor,
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(height: 40),
-                      ),
+                        }
+                      },
                     ),
                   ],
                 ),
               ),
               actions: [
-                // Cancel
                 SizedBox(
                   width: 100,
                   child: CustomButton(
-                    color: Colors.transparent,
                     text: language.cancel,
+                    color: Colors.transparent,
                     textColor: colors(context).textColor,
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-
-                // Save
                 SizedBox(
                   width: 100,
                   child: CustomButton(
+                    text: language.save,
                     gradient: LinearGradient(
                       colors: [
                         AppColors.kDarkGreenColor,
                         AppColors.kLightGreenColor,
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
                     ),
-                    text: language.save,
                     onPressed: () {
                       if (nameController.text.isEmpty) return;
 
                       setState(() {
-                        taskList.add(TaskModel(
-                          name: nameController.text,
-                          description: descController.text,
-                          createDate: DateTime.now(),
-                          status: status,
-                        ));
+                        taskList.add(
+                          TaskModel(
+                            name: nameController.text,
+                            description: descController.text,
+                            createDate: DateTime.now(),
+                            status: status, // هنا نخزن enum
+                          ),
+                        );
                       });
+
                       Navigator.pop(context);
                     },
                   ),
@@ -176,149 +142,140 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
   /// ================= EDIT TASK DIALOG =================
   void showEditTaskDialog(int index) {
     final task = taskList[index];
-    TextEditingController nameController =
-    TextEditingController(text: task.name);
-    TextEditingController descController =
-    TextEditingController(text: task.description);
-    String status = task.status;
+    TextEditingController nameController = TextEditingController(
+      text: task.name,
+    );
+    TextEditingController descController = TextEditingController(
+      text: task.description,
+    );
+    TaskStatus status = task.status; // استخدم enum هنا
 
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(builder: (context, setStateDialog) {
-          List<String> statuses = [
-            language.allStatus,
-            language.completed,
-            language.pending,
-          ];
-          return AlertDialog(
-            backgroundColor: colors(context).cardColor,
-            title: Padding(
-              padding: const EdgeInsets.only(bottom: 9.0),
-              child: Text(
-                language.editTask,
-                style: TextStyle(
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: colors(context).cardColor,
+              title: Padding(
+                padding: const EdgeInsets.only(bottom: 9.0),
+                child: Text(
+                  language.editTask,
+                  style: TextStyle(
                     fontSize: 16,
                     color: colors(context).textColor,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-            content: SizedBox(
-              width: 400,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Task Name
-                  Text(language.taskName,
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Task Name
+                    Text(
+                      language.taskName,
                       style: TextStyle(
-                          fontSize: 14, color: colors(context).textColor)),
-                  const SizedBox(height: 3),
-                  CustomTextField(
-                    controller: nameController,
-                    hint: language.enterTaskName,
-                  ),
-                  const SizedBox(height: 15),
-
-                  // Description
-                  Text(language.taskDescription,
-                      style: TextStyle(
-                          fontSize: 14, color: colors(context).textColor)),
-                  const SizedBox(height: 3),
-                  CustomTextField(
-                    controller: descController,
-                    hint: language.enterTaskDescription,
-                  ),
-                  const SizedBox(height: 15),
-
-                  // Status
-                  Text(language.taskStatus,
-                      style: TextStyle(
-                          fontSize: 14, color: colors(context).textColor)),
-                  const SizedBox(height: 3),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton2<String>(
-                      value: status,
-                      items: statuses
-                          .map((item) => DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(item,
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: colors(context).textColor)),
-                      ))
-                          .toList(),
-                      onChanged: (value) {
-                        setStateDialog(() {
-                          status = value!;
-                        });
-                      },
-                      buttonStyleData: ButtonStyleData(
-                        height: 50,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
+                        fontSize: 14,
+                        color: colors(context).textColor,
                       ),
-                      iconStyleData: const IconStyleData(
-                        icon: Icon(Icons.keyboard_arrow_down),
-                      ),
-                      dropdownStyleData: DropdownStyleData(
-                        maxHeight: 200,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: colors(context).backgroundColor,
-                        ),
-                      ),
-                      menuItemStyleData: const MenuItemStyleData(height: 40),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              // Cancel
-              SizedBox(
-                width: 100,
-                child: CustomButton(
-                  color: Colors.transparent,
-                  textColor: colors(context).textColor,
-                  text: language.cancel,
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
+                    const SizedBox(height: 3),
+                    CustomTextField(
+                      controller: nameController,
+                      hint: language.enterTaskName,
+                    ),
+                    const SizedBox(height: 15),
 
-              // Save
-              SizedBox(
-                width: 100,
-                child: CustomButton(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.kDarkGreenColor,
-                      AppColors.kLightGreenColor,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  text: language.save,
-                  onPressed: () {
-                    setState(() {
-                      taskList[index] = TaskModel(
-                        name: nameController.text,
-                        description: descController.text,
-                        createDate: task.createDate,
-                        status: status,
-                      );
-                    });
-                    Navigator.pop(context);
-                  },
+                    // Description
+                    Text(
+                      language.taskDescription,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colors(context).textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    CustomTextField(
+                      controller: descController,
+                      hint: language.enterTaskDescription,
+                    ),
+                    const SizedBox(height: 15),
+
+                    // Status
+                    Text(
+                      language.taskStatus,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colors(context).textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    DropdownButton2<TaskStatus>(
+                      value: status,
+                      items: TaskStatus.values.map((item) {
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(
+                            item == TaskStatus.pending ? "Pending" : "Completed",
+                            style: TextStyle(fontSize: 14, color: colors(context).textColor),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {         // <-- check null first
+                          setStateDialog(() {
+                            status = value;
+                          });
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ],
-          );
-        });
+              actions: [
+                // Cancel
+                SizedBox(
+                  width: 100,
+                  child: CustomButton(
+                    color: Colors.transparent,
+                    textColor: colors(context).textColor,
+                    text: language.cancel,
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                // Save
+                SizedBox(
+                  width: 100,
+                  child: CustomButton(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.kDarkGreenColor,
+                        AppColors.kLightGreenColor,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    text: language.save,
+                    onPressed: () {
+                      setState(() {
+                        taskList[index] = TaskModel(
+                          name: nameController.text,
+                          description: descController.text,
+                          createDate: task.createDate,
+                          status: status, // هنا نخزن enum
+                        );
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -403,21 +360,11 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
   }
 
   /// ================= FILTERED TASKS =================
-  List<TaskModel> get filteredTasks {
-    if (selectedStatus == language.allStatus) return taskList;
 
-    return taskList
-        .where((task) => task.status == selectedStatus)
-        .toList();
-  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> statuses = [
-      language.allStatus,
-      language.completed,
-      language.pending,
-    ];
+
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -510,16 +457,18 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final task = filteredTasks[index];
-                bool isCompleted = task.status == language.completed;
-                bool isPending = task.status == language.pending;
+
 
                 return InkWell(
                   onTap: () {
-                    setState(() {
-                      task.status = task.status == language.pending
-                          ? language.completed
-                          : language.pending;
-                    });
+
+                      setState(() {
+                        task.status =
+                        task.status == TaskStatus.completed
+                            ? TaskStatus.pending
+                            : TaskStatus.completed;
+                      });
+
                   },
                   child: Card(
                     elevation: 3,
@@ -533,29 +482,10 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
                         children: [
                           // Task Name Row
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              if (isCompleted)
-                                const Icon(Icons.check_circle,
-                                    color: Colors.green, size: 24),
-                              if (isPending)
-                                Icon(Icons.circle_outlined,
-                                    size: 24, color: colors(context).textColor),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  task.name,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    decoration: isCompleted
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                    color: isCompleted
-                                        ? Colors.grey
-                                        : colors(context).textColor,
-                                  ),
-                                ),
-                              ),
-                              statusWidget(task.status ),
+                              Expanded(child: taskNameWidget(task, context)),
+                              statusWidget(task.status)
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -615,31 +545,17 @@ class _TasksMobileScreenState extends State<TasksMobileScreen> {
   }
 }
 
-/// Status Widget
-Widget statusWidget(String status) {
-  Color statusColor;
-
-  if (status == language.completed) {
-    statusColor = Colors.green; // مكتمل
-  } else if (status == language.pending) {
-    statusColor = Colors.orange; // معلق
-  } else {
-    statusColor = Colors.grey; // أي حالة أخرى
-  }
+Widget statusWidget(TaskStatus status) {
+  bool isCompleted = status == TaskStatus.completed;
 
   return Row(
     children: [
-      Icon(
-        Icons.circle,
-        size: 10,
-        color: statusColor,
-      ),
+      Icon(Icons.circle, size: 10, color: isCompleted ? Colors.green : Colors.orange),
       const SizedBox(width: 6),
       Text(
-        status,
+        getTaskStatusText(status),
         style: TextStyle(
-          fontSize: 14,
-          color: statusColor,
+          color: isCompleted ? Colors.green : Colors.orange,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -647,26 +563,41 @@ Widget statusWidget(String status) {
   );
 }
 
-/// Task Name Widget
+/// TASK NAME WIDGET
+
 Widget taskNameWidget(TaskModel task, BuildContext context) {
-  bool isCompleted = task.status == language.completed;
-  bool isPending = task.status == language.pending;
+  bool isCompleted = task.status == TaskStatus.completed;
 
   return Row(
     children: [
-      if (isCompleted) const Icon(Icons.check_circle, color: Colors.green, size: 18),
-      if (isPending) Icon(Icons.circle_outlined, size: 24, color: colors(context).textColor),
-      if (isCompleted || isPending) const SizedBox(width: 6),
-      Expanded(
+      Icon(
+        isCompleted ? Icons.check_circle : Icons.circle_outlined,
+        color: isCompleted ? Colors.green : colors(context).textColor,
+        size: 18,
+      ),
+      const SizedBox(width: 6),
+      Flexible(
         child: Text(
           task.name,
           style: TextStyle(
-            fontSize: 14,
-            decoration: isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
-            color: isCompleted ? Colors.grey : colors(context).textColor,
+            decoration:
+            isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
+            fontWeight: FontWeight.w500,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     ],
   );
+}
+
+String getTaskStatusText(TaskStatus status) {
+  switch (status) {
+    case TaskStatus.pending:
+      return "Pending";
+    case TaskStatus.completed:
+      return "Completed";
+  }
+
 }

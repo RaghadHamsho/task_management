@@ -7,6 +7,7 @@ class ImagePath {
   //images
   static const String loginBackgroundEnglish = '$imageDir/login_background_english.png';
   static const String loginBackgroundArabic = '$imageDir/login_background_arabic.png';
+  static const String logoIcon = '$imageDir/logo_icon.png';
 }
 
 class IconPath {
