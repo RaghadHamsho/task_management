@@ -96,5 +96,5 @@ Fully supports Arabic and English, including layout adjustments for RTL (Right-t
 
 Setup / Installation
 
-Mobile APK (Android): Download APK  
-Web App: Open Link https://drive.google.com/file/d/1AF0vlNYyaaaorJTcoKCrVTnjZqM5trbM/view?usp=sharing
+Mobile APK : Download APP  https://drive.google.com/file/d/1AF0vlNYyaaaorJTcoKCrVTnjZqM5trbM/view?usp=sharing
+Web App: Open Link https://raghadhamsho.github.io/task_management/

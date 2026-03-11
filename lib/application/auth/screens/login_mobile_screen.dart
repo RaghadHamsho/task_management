@@ -42,59 +42,60 @@ class LoginMobileScreen extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child:
+        child:KeyboardVisibilityBuilder(
+          builder: (context, isKeyboardVisible) {
 
-          SingleChildScrollView(
+            return SingleChildScrollView(
               child: Column(
                 mainAxisAlignment:
-               MainAxisAlignment.center,
+                isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 10),
+                  if(!isKeyboardVisible)...[
+                    /// ICON
+                    Container(
+                      padding: const EdgeInsets.all(14),
 
-                  /// ICON
-                  Container(
-                    padding: const EdgeInsets.all(14),
-              
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          values.AppColors.kDarkGreenColor,
-                          values.AppColors.kLightGreenColor,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            values.AppColors.kDarkGreenColor,
+                            values.AppColors.kLightGreenColor,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      child: const Icon(
+                        Icons.library_add_check_outlined,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.library_add_check_outlined,
-                      color: Colors.white,
-                      size: 28,
+
+                    const SizedBox(height: 12),
+
+                    /// TITLE
+                    Text(
+                      language.appName,
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: colors(context).textColor,
+                      ),
                     ),
-                  ),
-              
-                  const SizedBox(height: 12),
-              
-                  /// TITLE
-                  Text(
-                   language.appName,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: colors(context).textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    language.title,
-                    style: TextStyle(
-                      color: isDark ? Colors.grey : Colors.black54,
-                      fontSize: 13,
-                    ),
-                  ),
-              
+                    const SizedBox(height: 6),
+                    Text(
+                      language.title,
+                      style: TextStyle(
+                        color: isDark ? Colors.grey : Colors.black54,
+                        fontSize: 13,
+                      ),
+                    ),],
+
                   const SizedBox(height: 30),
-              
+
                   /// CARD
                   Container(
                     width: 400,
@@ -126,7 +127,7 @@ class LoginMobileScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 20),
-              
+
                               /// USERNAME (Sign Up only)
                               if (isSignUp) ...[
                                 Text(
@@ -146,10 +147,10 @@ class LoginMobileScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 10),
                               ],
-              
+
                               /// EMAIL
                               Text(
-                              language.email,
+                                language.email,
                                 style: TextStyle(
                                   color: colors(context).textColor,
                                   fontSize: 14,
@@ -164,7 +165,7 @@ class LoginMobileScreen extends StatelessWidget {
                                 validator: Functions.emailValidator,
                               ),
                               const SizedBox(height: 10),
-              
+
                               /// PASSWORD
                               Text(
                                 language.password,
@@ -182,7 +183,7 @@ class LoginMobileScreen extends StatelessWidget {
                                 isAuth: true,
                                 validator: Functions.passwordValidator,
                               ),
-              
+
                               if (!isSignUp) ...[
                                 const SizedBox(height: 4),
                                 Align(
@@ -196,9 +197,9 @@ class LoginMobileScreen extends StatelessWidget {
                                   ),
                                 ),
                               ],
-              
+
                               SizedBox(height: isSignUp ? 20 : 50),
-              
+
                               /// BUTTON
                               CustomButton(
                                 gradient: LinearGradient(
@@ -223,9 +224,9 @@ class LoginMobileScreen extends StatelessWidget {
                       },
                     ),
                   ),
-              
+
                   const SizedBox(height: 35),
-              
+
                   /// TOGGLE SIGN IN / SIGN UP
                   GestureDetector(
                     onTap: () {
@@ -258,10 +259,11 @@ class LoginMobileScreen extends StatelessWidget {
                       },
                     ),
                   ),
-
-             ] ),
-            ),
-
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
