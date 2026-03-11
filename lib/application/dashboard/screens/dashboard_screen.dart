@@ -16,7 +16,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     int completedCount = taskList.where((t) => t.status == TaskStatus.completed).length;
 
-    int pendingCount = taskList.where((t) => t.status ==TaskStatus.completed).length;
+    int pendingCount = taskList.where((t) => t.status ==TaskStatus.pending).length;
 
     int totalCount = taskList.length;
     Map<int, int> completedPerMonth = {};

@@ -94,4 +94,7 @@ Multi-language Support:
 Fully supports Arabic and English, including layout adjustments for RTL (Right-to-Left).
 
 
+Setup / Installation
 
+Mobile APK (Android): Download APK  
+Web App: Open Link https://drive.google.com/file/d/1AF0vlNYyaaaorJTcoKCrVTnjZqM5trbM/view?usp=sharing

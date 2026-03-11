@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,20 +18,15 @@ import 'core/logic/global_bloc.dart';
 BaseLanguage language = LanguageEn();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-// enum Role { departmentSupervisor, specialist, employee }
-
-// Role role = Role.specialist;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if(!kIsWeb){
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);}
+  if (!kIsWeb) {
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  }
   await configureInjection();
   await getIt<AppStore>().initial();
-  runApp( const MyApp(),
-  );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -48,34 +42,34 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<GlobalBloc, GlobalState>(
         builder: (context, state) {
           return MaterialApp(
-              navigatorKey: navigatorKey,
-              builder: (context, child) {
-                child = EasyLoading.init(
-                  builder: (context, innerChild) {
-                    return MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        alwaysUse24HourFormat: false,
-                        textScaler: const TextScaler.linear(1.0),
-                      ),
-                      child: innerChild!,
-                    );
-                  },
-                )(context, child);
-                return child;
-              },
-              debugShowCheckedModeBanner: false,
-              theme: getAppTheme(context,
-                  state.isDarkTheme),
-              localizationsDelegates: const [
-                AppLocalizations(),
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: LanguageDataModel.languageLocales(),
-              localeResolutionCallback: (locale, supportedLocales) => locale,
-              locale: Locale(getIt<AppStore>().selectedLanguageCode),
-              home: const LoginScreen());
+            navigatorKey: navigatorKey,
+            builder: (context, child) {
+              child = EasyLoading.init(
+                builder: (context, innerChild) {
+                  return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      alwaysUse24HourFormat: false,
+                      textScaler: const TextScaler.linear(1.0),
+                    ),
+                    child: innerChild!,
+                  );
+                },
+              )(context, child);
+              return child;
+            },
+            debugShowCheckedModeBanner: false,
+            theme: getAppTheme(context, state.isDarkTheme),
+            localizationsDelegates: const [
+              AppLocalizations(),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: LanguageDataModel.languageLocales(),
+            localeResolutionCallback: (locale, supportedLocales) => locale,
+            locale: Locale(getIt<AppStore>().selectedLanguageCode),
+            home: const LoginScreen(),
+          );
         },
       ),
     );

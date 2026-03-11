@@ -41,8 +41,7 @@ dependencies:
   flutter_bloc: ^8.1.2
   intl:
   dio: ^5.3.3
-  flutter_loadingindicator: ^1.0.1
-  fluttertoast: ^8.2.2
+  flutter_loadingindicator:
   easy_sidemenu: ^0.6.1
   dropdown_button2: ^2.3.9
   fl_chart: ^0.66.0

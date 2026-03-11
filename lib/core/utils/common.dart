@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:task_management_system/core/utils/extensions/int_extensions.dart';
-import 'package:task_management_system/core/utils/extensions/string_extensions.dart';
-
 import '../app_store/app_store.dart';
-import 'extensions/device_extensions.dart';
 import 'functions.dart';
 
 T? makeNullable<T>(T? value) => value;
@@ -16,46 +12,46 @@ bool hasMatch(String? s, String p) {
   return (s == null) ? false : RegExp(p).hasMatch(s);
 }
 
-void toast(
-  String? value, {
-  ToastGravity? gravity,
-  length = Toast.LENGTH_SHORT,
-  Color? bgColor,
-  Color? textColor,
-  bool print = false,
-}) {
-  if (value!.validate().isEmpty || isLinux) {
-    Functions.printNormal(value);
-  } else {
-    Fluttertoast.showToast(
-      msg: value.validate(),
-      gravity: gravity,
-      toastLength: length,
-      backgroundColor: bgColor,
-      textColor: textColor,
-    );
-    if (print) Functions.printNormal(value);
-  }
-}
+// void toast(
+//   String? value, {
+//   ToastGravity? gravity,
+//   length = Toast.LENGTH_SHORT,
+//   Color? bgColor,
+//   Color? textColor,
+//   bool print = false,
+// }) {
+//   if (value!.validate().isEmpty || isLinux) {
+//     Functions.printNormal(value);
+//   } else {
+//     Fluttertoast.showToast(
+//       msg: value.validate(),
+//       gravity: gravity,
+//       toastLength: length,
+//       backgroundColor: bgColor,
+//       textColor: textColor,
+//     );
+//     if (print) Functions.printNormal(value);
+//   }
+// }
 
-void toastLong(
-  String? value, {
-  BuildContext? context,
-  ToastGravity gravity = ToastGravity.BOTTOM,
-  length = Toast.LENGTH_LONG,
-  Color? bgColor,
-  Color? textColor,
-  bool print = false,
-}) {
-  toast(
-    value,
-    gravity: gravity,
-    bgColor: bgColor,
-    textColor: textColor,
-    length: length,
-    print: print,
-  );
-}
+// void toastLong(
+//   String? value, {
+//   BuildContext? context,
+//   ToastGravity gravity = ToastGravity.BOTTOM,
+//   length = Toast.LENGTH_LONG,
+//   Color? bgColor,
+//   Color? textColor,
+//   bool print = false,
+// }) {
+//   toast(
+//     value,
+//     gravity: gravity,
+//     bgColor: bgColor,
+//     textColor: textColor,
+//     length: length,
+//     print: print,
+//   );
+// }
 
 void snackBar(
   BuildContext context, {

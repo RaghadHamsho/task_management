@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:task_management_system/core/utils/extensions/int_extensions.dart';
 import 'package:task_management_system/core/values/values.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +26,7 @@ List<LanguageDataModel> localeLanguageList = [
 
 Color defaultToastBackgroundColor = Colors.grey.shade200;
 Color defaultToastTextColor = Colors.black;
-ToastGravity defaultToastGravityGlobal = ToastGravity.CENTER;
+// ToastGravity defaultToastGravityGlobal = ToastGravity.CENTER;
 
 Duration pageRouteTransitionDurationGlobal = 400.milliseconds;
 
